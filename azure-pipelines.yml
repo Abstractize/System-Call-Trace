@@ -33,7 +33,7 @@ jobs:
     inputs:
       targetType: inline
       script: >
-        build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir /build/ make clean all
+        build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir /build/ cmake
   - task: SonarCloudAnalyze@1
     displayName: Run Code Analysis
   - task: SonarCloudPublish@1
