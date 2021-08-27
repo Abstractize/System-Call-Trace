@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     char **other_args;
     other_args = malloc(1024 * sizeof(char));
     get_program_and_args(other_args, argc, argv);
-    int other_argc = strlen(*other_args);
+    unsigned long other_argc = strlen(*other_args);
     printf("Set mode is %s\n", mode);
     printf("Set filter is %s\n", filter);
     printf("Other args len: %ld\n", other_argc);
