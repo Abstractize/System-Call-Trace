@@ -3,7 +3,7 @@
 #include <string.h>
 
 
-char *get_from_argv(char *compare, int argc, char *argv[])
+char *get_from_argv(const char *compare, int argc, char *argv[])
 {
     for (int counter = 0; counter < argc; counter++)
     {
@@ -16,17 +16,18 @@ char *get_from_argv(char *compare, int argc, char *argv[])
 void get_program_and_args(char* dest[], int argc, char *argv[])
 {
     int args_count = 0;
-    for (int counter = 1; counter < argc; counter++)
+    int counter = 1;
+    while (counter < argc)
     {
         if (strcmp("--mode", argv[counter]) && strcmp("--filter", argv[counter]))
         {
         	dest[args_count] = malloc(strlen(argv[counter]) * sizeof(char));
             strcpy(dest[args_count], argv[counter]);
-            //strcat(dest[args_count], "\0");
             args_count++;
         }
         else
             counter++;
+        counter++;
     }
 }
 
@@ -37,16 +38,14 @@ int main(int argc, char *argv[])
     char **other_args;
     other_args = malloc(1024 * sizeof(char));
     get_program_and_args(other_args, argc, argv);
-    printf("Number of args: %d\n", argc);
+    int other_argc = strlen(*other_args);
     printf("Set mode is %s\n", mode);
     printf("Set filter is %s\n", filter);
-    printf("Other args len: %ld\n", strlen(*other_args));
+    printf("Other args len: %ld\n", other_argc);
     printf("Other arguments are\n");
-    for (int counter = 0; counter < strlen(*other_args); counter++)
+    for (int counter = 0; counter < other_argc; counter++)
     {
     	printf("%s\n",other_args[counter]);
-        //free(other_args[counter]);
     }
-    //free(other_args);
-    //return 0;
 }
+
