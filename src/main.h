@@ -1,6 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/ptrace.h>
+#include <sys/user.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/reg.h>
 
 /***
  *  Function that produces the value for the given argument key
@@ -25,7 +31,7 @@ char *get_from_argv(const char *compare, int argc, char *argv[]);
  *
  * @return the size of the destination array
  */
-int get_program_and_args(char* dest[], int argc, char *argv[]);
+int get_program_and_args(char *program_dest, char* dest[], int argc, char *argv[]);
 
 /***
  * Program that lists all the syscalls made to the system by a program passed
