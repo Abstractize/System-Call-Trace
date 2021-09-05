@@ -56,33 +56,62 @@ void exec_fork(char *program, char* argv[], char *mode, char *filter)
 	 int in_call =0;
 	 char syscall_name[256];
 	 int interact_flag = 0;
+	 int filter_flag = 0;
 
 	 if(!strcmp(mode, "interactive"))
 		 interact_flag = 1;
+
+	 if(!strcmp(filter, "process"))
+		 filter_flag = 1;
+	 else if(!strcmp(filter, "memory"))
+		 filter_flag = 2;
 
 
 	 switch(pid = fork()){
 	   case -1:
 	     perror("fork");
 	     exit(1);
-	   case 0: /* in the child process */
+	   case 0: // child process
 	     ptrace(PTRACE_TRACEME, 0, NULL, NULL);
 	     execvp(program, argv);
 	     break;
-	   default: /* in the parent process */
+	   default: // parent process
 	     wait(&status);
 	     while(status == 1407){
 	       ptrace(PTRACE_GETREGS, pid, NULL, &regs);
 	       if(!in_call){
+	    	 in_call=1;
 			 get_syscall(regs.orig_rax, syscall_name);
-	         printf("Executed syscall %s\n",syscall_name);
-	         syscalls[regs.orig_rax]++;
-	         in_call=1;
-	         counter ++;
+			 switch(filter_flag)
+			 {
+			  case 0:
+				 printf("Executed syscall %s\n",syscall_name);
+				 syscalls[regs.orig_rax]++;
+				 counter ++;
+				 if(interact_flag)
+					 getchar();
+				 break;
+			  case 1:
+				  if (strstr(get_syscall,"fork")!= NULL||strstr(syscall_name,"exit")!= NULL||strstr(syscall_name,"exec")!= NULL){
+					  printf("Executed syscall %s\n",syscall_name);
+					  syscalls[regs.orig_rax]++;
+					  counter ++;
+					  if(interact_flag)
+						  getchar();
+				  }
+				  break;
+			  default:
+				  if ((strstr(syscall_name,"open")!= NULL)||(strstr(syscall_name,"read")!= NULL)||(strstr(syscall_name,"write")!= NULL)||(strstr(syscall_name,"close")!= NULL)){
+				  	  printf("Executed syscall %s\n",syscall_name);
+					  syscalls[regs.orig_rax]++;
+					  counter ++;
+					  if(interact_flag)
+						  getchar();
+				  }
+				  break;
+			 }
 	       }
 	       else{
-	    	 if(interact_flag)
-	    		   getchar();
 	         in_call = 0;
 	       }
 	     ptrace(PTRACE_SYSCALL, pid, NULL, NULL);
@@ -103,7 +132,7 @@ void exec_fork(char *program, char* argv[], char *mode, char *filter)
 		   }
 	   }
 	   printf("+---------------+-------+-------+\n");
-	   printf("Total Number of System Calls=%d\n", counter);
+	   printf("Total\t\t\t %d\n", counter);
 }
 
 int main(int argc, char *argv[])
@@ -117,8 +146,6 @@ int main(int argc, char *argv[])
     get_program_and_args(program_name, other_argv, argc, argv);
 
     exec_fork(program_name, other_argv, mode, filter);
-
-    printf("Set filter is %s\n", filter);
 
     return 0;
 }
