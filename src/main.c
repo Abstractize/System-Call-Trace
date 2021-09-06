@@ -101,7 +101,7 @@ void exec_fork(char *program, char* argv[], char *mode, char *filter)
 				  }
 				  break;
 			  default:
-				  if ((strstr(syscall_name,"open")!= NULL)||(strstr(syscall_name,"read")!= NULL)||(strstr(syscall_name,"write")!= NULL)||(strstr(syscall_name,"close")!= NULL)){
+				  if ((strstr(syscall_name,"brk")!= NULL)||(strstr(syscall_name,"map")!= NULL)){
 				  	  printf("Executed syscall %s\n",syscall_name);
 					  syscalls[regs.orig_rax]++;
 					  counter ++;
